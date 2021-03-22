@@ -1,0 +1,11 @@
+replicaCount: 1
+imageRepo: camera-dns-arm64:v1.0
+imagePullPolicy: Always
+#imagePullPolicy: IfNotPresent
+hostname: ""
+
+PLATFORM_HARBOR_URL: ""
+
+user: ""
+pwd: ""
+url: ""

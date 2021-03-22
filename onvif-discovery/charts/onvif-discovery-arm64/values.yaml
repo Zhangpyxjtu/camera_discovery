@@ -1,0 +1,11 @@
+replicaCount: 1
+imageRepo: onvif-discovery-arm64:v6.0
+imagePullPolicy: Always
+#imagePullPolicy: IfNotPresent
+hostname: ""
+
+PLATFORM_HARBOR_URL: ""
+
+user: ""
+pwd: ""
+url: ""

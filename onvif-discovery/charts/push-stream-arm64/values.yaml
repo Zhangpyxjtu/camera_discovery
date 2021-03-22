@@ -1,0 +1,9 @@
+replicaCount: 1
+imagePushStreamRepo: push-stream-arm64:v1.0
+imageRtmpServerRepo: rtmp-arm64:v1.0
+imagePullPolicy: Always
+PLATFORM_HARBOR_URL: ""
+hostname: ""
+
+node: ""
+deviceUrl: ""

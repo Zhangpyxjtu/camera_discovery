@@ -1,0 +1,6 @@
+FROM 101.206.211.217:8079/mec/python-arm64:3.7.8-buster
+RUN apt-get update && apt-get install -y avahi-daemon && apt-get install -y avahi-utils
+RUN mkdir work
+WORKDIR /work
+COPY ./bin /work
+CMD ["python3", "-u","camera_dns.py"]

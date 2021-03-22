@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "onvif-discovery.fullname" . }}
+  labels:
+    {{- include "onvif-discovery.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "onvif-discovery.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "onvif-discovery.selectorLabels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      hostNetwork: true
+      containers:
+        - name: onvif-discovery
+          image: "{{ .Values.PLATFORM_HARBOR_URL }}{{ .Values.imageRepo }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          env:
+            - name: user
+              value: {{ .Values.user | quote }}
+            - name: pwd
+              value: {{ .Values.pwd | quote }}
+            - name: url
+              value: {{ .Values.url | quote }}
+            - name: edgenodeKey
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 1024Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+          volumeMounts:
+            - name: host-time
+              mountPath: /etc/localtime
+      volumes:
+      - name: host-time
+        hostPath:
+          path: /etc/localtime
+      nodeSelector:
+        k3s.io/hostname: {{ .Values.hostname }}
+        

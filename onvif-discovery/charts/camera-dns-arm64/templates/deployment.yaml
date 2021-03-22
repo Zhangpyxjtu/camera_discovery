@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "camera-dns.fullname" . }}
+  labels:
+    {{- include "camera-dns.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "camera-dns.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "camera-dns.selectorLabels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      hostNetwork: true
+      containers:
+        - name: camera-dns
+          image: "{{ .Values.PLATFORM_HARBOR_URL }}{{ .Values.imageRepo }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: url
+              value: {{ .Values.url | quote }}
+            - name: edgenodeKey
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 1024Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+          volumeMounts:
+            - name: host-time
+              mountPath: /etc/localtime
+      volumes:
+      - name: host-time
+        hostPath:
+          path: /etc/localtime
+      nodeSelector:
+        k3s.io/hostname: {{ .Values.hostname }}

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "push-stream-arm64.fullname" . }}
+  labels:
+    {{- include "push-stream-arm64.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "push-stream-arm64.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+      labels:
+        {{- include "push-stream-arm64.selectorLabels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      hostNetwork: true   
+      containers:
+        - name: push-stream
+          image: "{{ .Values.PLATFORM_HARBOR_URL }}{{ .Values.imagePushStreamRepo }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          env:
+            - name: node
+              value: {{ .Values.node | quote }}
+            - name: deviceUrl
+              value: {{ .Values.deviceUrl | quote }} 
+          resources:
+            requests:
+              cpu: 2000m
+              memory: 50Mi
+            limits:
+              cpu: 2000m
+              memory: 50Mi
+        - name: rtmp
+          image: "{{ .Values.PLATFORM_HARBOR_URL }}{{ .Values.imageRtmpServerRepo }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: 1935
+              hostPort: 1935
+          resources:
+            requests:
+              cpu: 50m
+              memory: 25Mi
+            limits:
+              cpu: 50m
+              memory: 25Mi
+      nodeSelector:
+        k3s.io/hostname: {{ .Values.hostname }}
